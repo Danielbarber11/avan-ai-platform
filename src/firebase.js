@@ -1,32 +1,49 @@
-// Import the functions you need from the SDKs you need
-// import { initializeApp } from "firebase/app";
-// import { getAnalytics } from "firebase/analytics";
+import { initializeApp } from 'firebase/app';
+import { getAuth, GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
 
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
-
-// Your web app's Firebase configuration
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
+// TODO: Replace the following with your app's Firebase project configuration
+// You can get this from the Firebase Console: Project Settings -> General -> Your apps
 const firebaseConfig = {
     apiKey: "YOUR_API_KEY_HERE",
-    authDomain: "avan-ai.firebaseapp.com",
-    projectId: "avan-ai",
-    storageBucket: "avan-ai.appspot.com",
-    messagingSenderId: "123456789",
-    appId: "1:123456789:web:abcdef123456",
-    measurementId: "G-ABCDEF123"
+    authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+    projectId: "YOUR_PROJECT_ID",
+    storageBucket: "YOUR_PROJECT_ID.appspot.com",
+    messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+    appId: "YOUR_APP_ID"
 };
 
 // Initialize Firebase
-// const app = initializeApp(firebaseConfig);
-// const analytics = getAnalytics(app);
+let app;
+let auth;
+let googleProvider;
 
-export const mockSaveToCloud = async (data) => {
-    console.log("Saving to Avan Cloud...", data);
-    return new Promise((resolve) => setTimeout(resolve, 1000));
+try {
+    app = initializeApp(firebaseConfig);
+    auth = getAuth(app);
+    googleProvider = new GoogleAuthProvider();
+} catch (error) {
+    console.warn("Firebase not configured correctly. Please check firebase.js");
+}
+
+export const signInWithGoogle = async () => {
+    if (!auth) {
+        alert("שגיאה: הגדרות Firebase חסרות.\nאנא פתח את הקובץ src/firebase.js והדבק את המפתחות שלך.");
+        return null;
+    }
+    try {
+        const result = await signInWithPopup(auth, googleProvider);
+        return result.user;
+    } catch (error) {
+        console.error("Error signing in with Google", error);
+        alert("שגיאה בהתחברות עם גוגל: " + error.message);
+        return null;
+    }
 };
 
-export const mockLoginWithGoogle = async () => {
-    console.log("Logging in with Google...");
-    return new Promise((resolve) => setTimeout(() => resolve({ user: "Google User" }), 1500));
+export const mockSaveToCloud = (data) => {
+    console.log('Saving to cloud (Mock):', data);
+    // In a real app, this would use Firestore or Realtime Database
+    // const db = getFirestore(app);
+    // addDoc(collection(db, "data"), data);
+    alert('הנתונים נשמרו בענן! (הדמיה)');
 };

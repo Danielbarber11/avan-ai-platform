@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Avan AI - Gemini 3 Preview</title>
+    <title>Avan AI - Platform Hub</title>
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -627,7 +627,118 @@
             display: inline;
         }
 
-        /* Home Page CSS - Split Screen */
+        /* Dashboard Page CSS */
+        .dashboard-page {
+            min-height: 100vh;
+            background: #f8fafc;
+            background-image: radial-gradient(circle at 10% 20%, rgba(59, 130, 246, 0.05) 0%, transparent 20%), radial-gradient(circle at 90% 80%, rgba(236, 72, 153, 0.05) 0%, transparent 20%);
+        }
+
+        .hub-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+            padding-top: 4rem;
+        }
+
+        .hub-header {
+            text-align: center;
+            margin-bottom: 4rem;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        .hub-header h1 {
+            font-size: 3rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+            background: var(--gradient-main);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .hub-header p {
+            color: #64748b;
+            font-size: 1.2rem;
+        }
+
+        .tools-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            padding: 1rem;
+        }
+
+        .tool-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 20px;
+            border: 1px solid #e2e8f0;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        .tool-card:hover:not(.disabled) {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            border-color: var(--color-primary);
+        }
+
+        .tool-icon {
+            margin-bottom: 1.5rem;
+            color: var(--color-primary);
+            background: #eff6ff;
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-left: auto;
+            margin-right: auto;
+            transition: transform 0.3s;
+        }
+
+        .tool-card:hover:not(.disabled) .tool-icon {
+            transform: scale(1.1) rotate(5deg);
+            background: var(--gradient-main);
+            color: white;
+        }
+
+        .tool-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+            color: #1e293b;
+        }
+
+        .tool-card p {
+            color: #64748b;
+            line-height: 1.5;
+        }
+
+        .tool-card.disabled {
+            opacity: 0.7;
+            cursor: default;
+            background: #f1f5f9;
+        }
+
+        .badge-coming-soon {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: #cbd5e1;
+            color: #475569;
+            font-size: 0.7rem;
+            padding: 0.2rem 0.6rem;
+            border-radius: 20px;
+            font-weight: 600;
+        }
+
+        /* Code Tool Page CSS */
         .home-page {
             height: 100vh;
             background: #f8fafc;
@@ -1303,7 +1414,48 @@
             );
         };
 
-        const HomePage = () => {
+        const DashboardPage = () => {
+            const navigate = useNavigate();
+            const tools = [
+                { id: 'code', title: 'מחולל קוד', icon: 'code', desc: 'צור קוד, אתרים ואפליקציות במהירות', path: '/tool/code', active: true },
+                { id: 'image', title: 'עורך תמונות', icon: 'image', desc: 'ערוך וצור תמונות עם AI', path: '/tool/image', active: false },
+                { id: 'video', title: 'יוצר וידאו', icon: 'video', desc: 'הפוך טקסט לסרטונים מרהיבים', path: '/tool/video', active: false },
+                { id: 'story', title: 'מספר סיפורים', icon: 'book-open', desc: 'כתוב סיפורים ותסריטים יצירתיים', path: '/tool/story', active: false },
+            ];
+
+            return (
+                <div className="dashboard-page">
+                    <nav className="navbar glass-panel">
+                        <div className="nav-brand">
+                            <Icon name="sparkles" size={24} style={{ marginRight: '0.5rem', color: '#ec4899' }} />
+                            Avan <span style={{ fontSize: '0.9rem', opacity: 0.7, marginLeft: '0.5rem' }}>Hub</span>
+                        </div>
+                        <div className="nav-actions">
+                            <button className="nav-btn" title="הגדרות"><Icon name="settings" size={20} /></button>
+                            <button className="nav-btn" title="התנתקות" onClick={() => navigate('/')}><Icon name="log-out" size={20} /></button>
+                        </div>
+                    </nav>
+                    <div className="hub-container">
+                        <div className="hub-header">
+                            <h1>ברוך הבא לאוואן</h1>
+                            <p>בחר את הכלי שברצונך להשתמש בו היום</p>
+                        </div>
+                        <div className="tools-grid">
+                            {tools.map((tool) => (
+                                <div key={tool.id} className={`tool-card ${!tool.active ? 'disabled' : ''}`} onClick={() => tool.active && navigate(tool.path)}>
+                                    <div className="tool-icon"><Icon name={tool.icon} size={40} /></div>
+                                    <h3>{tool.title}</h3>
+                                    <p>{tool.desc}</p>
+                                    {!tool.active && <span className="badge-coming-soon">בקרוב</span>}
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        const CodeToolPage = () => {
             const navigate = useNavigate();
             const [messages, setMessages] = useState([
                 { type: 'bot', content: 'שלום! אני אוואן (Gemini 3). אני כאן כדי לעזור לך ליצור דברים מדהימים.' }
@@ -1375,8 +1527,11 @@
                     </div>
                     <nav className="navbar glass-panel">
                         <div className="nav-brand">
+                            <button className="nav-btn" onClick={() => navigate('/home')} style={{ marginLeft: '1rem' }}>
+                                <Icon name="arrow-right" size={20} />
+                            </button>
                             <Icon name="sparkles" size={20} style={{ marginRight: '0.5rem', color: '#ec4899' }} />
-                            Avan <span style={{ fontSize: '0.8rem', opacity: 0.7, marginLeft: '0.5rem' }}>Gemini 3</span>
+                            Avan <span style={{ fontSize: '0.8rem', opacity: 0.7, marginLeft: '0.5rem' }}>Code Studio</span>
                         </div>
                         <div className="nav-actions">
                             <button className="nav-btn" title="שמירה בענן"><Icon name="cloud" size={20} /></button>
@@ -1530,7 +1685,8 @@
                     <Routes>
                         <Route path="/" element={<LandingPage />} />
                         <Route path="/terms" element={<TermsPage />} />
-                        <Route path="/home" element={<HomePage />} />
+                        <Route path="/home" element={<DashboardPage />} />
+                        <Route path="/tool/code" element={<CodeToolPage />} />
                         <Route path="/login" element={<LoginPage />} />
                         <Route path="/signup" element={<SignupPage />} />
                         <Route path="/accessibility-statement" element={<AccessibilityStatement />} />
