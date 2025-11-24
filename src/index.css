@@ -1,0 +1,37 @@
+:root {
+  --font-main: 'Rubik', sans-serif;
+  
+  /* Colors */
+  --color-bg: #ffffff;
+  --color-text: #1a1a1a;
+  --color-primary: #3b82f6; /* Blue */
+  --color-secondary: #ec4899; /* Pink */
+  --color-accent: #eab308; /* Yellow */
+  
+  --gradient-main: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
+  --gradient-accent: linear-gradient(135deg, var(--color-primary), var(--color-accent));
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-main);
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  direction: rtl; /* Hebrew support */
+  overflow-x: hidden;
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
