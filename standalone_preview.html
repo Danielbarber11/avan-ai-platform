@@ -1262,442 +1262,812 @@
             color: white;
         }
     </style>
-</head>
+    const [fontSize, setFontSize] = useState(100);
+    const [contrast, setContrast] = useState('normal');
 
-<body>
-    <div id="root"></div>
+    useEffect(() => {
+    document.documentElement.style.fontSize = `${fontSize}%`;
+    document.body.classList.remove('high-contrast');
+    if (contrast === 'high') {
+    document.body.classList.add('high-contrast');
+    }
+    }, [fontSize, contrast]);
 
-    <script type="text/babel">
-        const { useState, useEffect } = React;
-        const { HashRouter, Routes, Route, useNavigate, Link } = ReactRouterDOM;
+    const resetSettings = () => {
+    setFontSize(100);
+    setContrast('normal');
+    };
 
-        // Icons placeholder
-        const Icon = ({ name, size = 24, style = {} }) => {
-            useEffect(() => {
-                lucide.createIcons();
-            }, [name]);
-            return <i data-lucide={name} style={{ width: size, height: size, ...style }}></i>;
-        };
+    return (
+    <div className="accessibility-widget">
+        <button className="accessibility-toggle" onClick={()=> setIsOpen(!isOpen)} aria-label="תפריט נגישות">
+            <Icon name="accessibility" />
+        </button>
+        {isOpen && (
+        <div className="accessibility-menu">
+            <div className="menu-header">
+                <h3>כלי נגישות</h3>
+                <button onClick={()=> setIsOpen(false)}>
+                    <Icon name="x" size={20} />
+                </button>
+            </div>
+            <div className="menu-section">
+                <label>גודל טקסט</label>
+                <div className="controls">
+                    <button onClick={()=> setFontSize(prev => Math.max(80, prev - 10))}>A-</button>
+                    <span>{fontSize}%</span>
+                    <button onClick={()=> setFontSize(prev => Math.min(150, prev + 10))}>A+</button>
+                </div>
+            </div>
+            <div className="menu-section">
+                <label>ניגודיות</label>
+                <div className="controls">
+                    <button className={contrast==='normal' ? 'active' : '' } onClick={()=>
+                        setContrast('normal')}>רגילה</button>
+                    <button className={contrast==='high' ? 'active' : '' } onClick={()=>
+                        setContrast('high')}>גבוהה</button>
+                </div>
+            </div>
+            <div className="menu-actions">
+                <button className="btn-reset" onClick={resetSettings}>
+                    <Icon name="refresh-cw" size={16} /> איפוס הגדרות
+                </button>
+                <Link to="/accessibility-statement" className="btn-statement">הצהרת נגישות</Link>
+            </div>
+        </div>
+        )}
+    </div>
+    );
+    };
 
-        // --- COMPONENTS ---
+    const LandingPage = () => {
+    const navigate = useNavigate();
+    const [activeFeature, setActiveFeature] = useState(null);
+    const features = [
+    { id: 'story', title: 'יצירת סיפורים', desc: 'תן לאוואן ליצור עבורך עולמות קסומים וסיפורים מרתקים בהתאמה אישית.' },
+    { id: 'image', title: 'יצירת תמונות', desc: 'הפוך את הדמיון למציאות עם מחולל התמונות המתקדם שלנו.' },
+    { id: 'edit', title: 'עריכת תמונות', desc: 'כלים מקצועיים לעריכה ושיפור תמונות בקלות ובמהירות.' },
+    { id: 'code', title: 'יצירת קוד', desc: 'עוזר תכנות חכם לכתיבת קוד נקי, יעיל ומהיר.' },
+    { id: 'bot', title: 'בוט AI', desc: 'בן שיחה אינטליגנטי לכל שאלה, בעיה או סתם בשביל הכיף.' },
+    ];
+    const handleFeatureClick = (feature) => setActiveFeature(feature);
+    const closeModal = () => setActiveFeature(null);
+    const handleGuestEntry = () => navigate('/terms');
 
-        const AccessibilityWidget = () => {
-            const [isOpen, setIsOpen] = useState(false);
-            const [fontSize, setFontSize] = useState(100);
-            const [contrast, setContrast] = useState('normal');
+    return (
+    <div className="landing-page">
+        <section className="hero">
+            <div className="hero-bg">
+                <div className="blob blob-1"></div>
+                <div className="blob blob-2"></div>
+                <div className="blob blob-3"></div>
+            </div>
+            <div className="hero-content">
+                <h1 className="title-ivan">Avan</h1>
+                <div className="cards-container">
+                    {features.map((feature) => (
+                    <div key={feature.id} className="feature-card" onClick={()=> handleFeatureClick(feature)}>
+                        {feature.title}
+                    </div>
+                    ))}
+                </div>
+                <div className="auth-buttons">
+                    <div className="auth-row">
+                        <button className="btn btn-primary" onClick={()=> navigate('/login')}>התחברות</button>
+                        <button className="btn btn-outline" onClick={()=> navigate('/signup')}>הרשמה</button>
+                    </div>
+                    <button className="btn btn-guest" onClick={handleGuestEntry}>היכנס כאורח</button>
+                </div>
+            </div>
+        </section>
+        {activeFeature && (
+        <div className="modal-overlay" onClick={closeModal}>
+            <div className="modal-content" onClick={(e)=> e.stopPropagation()}>
+                <button className="modal-close" onClick={closeModal}>
+                    <Icon name="x" size={24} />
+                </button>
+                <h3>{activeFeature.title}</h3>
+                <p>{activeFeature.desc}</p>
+            </div>
+        </div>
+        )}
+    </div>
+    );
+    };
 
-            useEffect(() => {
-                document.documentElement.style.fontSize = `${fontSize}%`;
-                document.body.classList.remove('high-contrast');
-                if (contrast === 'high') {
-                    document.body.classList.add('high-contrast');
-                }
-            }, [fontSize, contrast]);
-
-            const resetSettings = () => {
-                setFontSize(100);
-                setContrast('normal');
-            };
-
-            return (
-                <div className="accessibility-widget">
-                    <button className="accessibility-toggle" onClick={() => setIsOpen(!isOpen)} aria-label="תפריט נגישות">
-                        <Icon name="accessibility" />
+    const TermsPage = () => {
+    const navigate = useNavigate();
+    const placeholderSection = "תנאים משפטיים נוספים... ".repeat(500);
+    const legalText = `תנאי שימוש והסכם משפטי - אוואן AI\n\n1. מבוא\nברוכים הבאים לאוואן AI. השימוש באתר זה כפוף לתנאים
+    המפורטים להלן. אנא קרא אותם בעיון רב. השימוש באתר מהווה הסכמה מלאה לכל התנאים הללו.\n\n2. הגבלת אחריות\nהחברה אינה
+    אחראית לכל נזק, ישיר או עקיף, שייגרם כתוצאה משימוש בשירותי הבינה המלאכותית.\nהמשתמש מצהיר כי הוא מודע לכך שהשירותים
+    מבוססים על טכנולוגיה ניסיונית ועשויים להכיל טעויות, אי-דיוקים או תוכן שאינו הולם.\nהחברה לא תישא באחריות על אובדן
+    מידע, נזקים למכשיר הקצה, או כל נזק אחר.\n\n3. וויתור על תביעות\nהמשתמש מוותר בזאת באופן בלתי חוזר על כל זכות תביעה,
+    דרישה או טענה כלפי החברה, מנהליה, עובדיה, ספקיה או מי מטעמה.\nלא ניתן לתבוע את החברה בגין שום סיבה שהיא, כולל אך לא
+    רק: אובדן נתונים, תוצאות לא מדויקות, הפרת זכויות יוצרים על ידי ה-AI, או עוגמת נפש.\n\n4. קניין רוחני\nכל הזכויות
+    שמורות לאוואן AI. אין להעתיק, לשכפל, להפיץ, לשדר, להציג בפומבי או ליצור יצירות נגזרות מתכנים מהאתר ללא אישור בכתב
+    ומראש מהחברה.\nהתוצרים הנוצרים על ידי ה-AI עשויים להיות כפופים לזכויות יוצרים של צדדים שלישיים או של החברה, והמשתמש
+    אחראי לוודא את זכויות השימוש בהם.\n\n5. פרטיות ואבטחת מידע\nאנו מכבדים את פרטיותך. עם זאת, שיחות עם הבוט, תמונות
+    שנוצרו וקוד שנכתב עשויים להישמר לצורכי שיפור השירות, אימון המודלים ובקרת איכות.\nהמשתמש מסכים לכך שהמידע שהוא מזין
+    לאתר אינו סודי ועשוי להיות חשוף לצדדים שלישיים במסגרת תפעול השירות.\n\n6. שינויים בתנאים\nהחברה שומרת לעצמה את הזכות
+    לשנות את התנאים בכל עת ללא הודעה מוקדמת. באחריות המשתמש להתעדכן בתנאים מעת לעת.\n\n${placeholderSection}\n\n7. סמכות
+    שיפוט\nעל תנאים אלו יחולו דיני מדינת ישראל בלבד. סמכות השיפוט הבלעדית בכל עניין הקשור לאתר או לתנאים אלו נתונה לבתי
+    המשפט המוסמכים בתל אביב-יפו.\n\n8. הסכמה\nבלחיצה על "הסכם להכל", אתה מאשר שקראת, הבנת והסכמת לכל התנאים הנ"ל, כולל
+    סעיפי הגבלת האחריות והוויתור על תביעות.`;
+    return (
+    <div className="terms-page">
+        <div className="terms-container">
+            <div className="terms-header">
+                <h1>צור תנאים</h1>
+                <p>אנא אשר את התנאים והמדיניות כדי להמשיך</p>
+            </div>
+            <div className="terms-content">{legalText}</div>
+            <div className="terms-actions">
+                <button className="btn-agree" onClick={()=> navigate('/home')}>הסכם להכל</button>
+                <div className="btn-close-container">
+                    <button className="btn-close" onClick={()=> navigate('/')}>
+                        <span>יציאה</span>
+                        <Icon name="x" size={24} />
                     </button>
-                    {isOpen && (
+                </div>
+            </div>
+        </div>
+    </div>
+    );
+    };
+
+    const DashboardPage = () => {
+    const navigate = useNavigate();
+    const tools = [
+    { id: 'code', title: 'מחולל קוד', icon: 'code', desc: 'צור קוד, אתרים ואפליקציות במהירות', path: '/tool/code',
+    active: true },
+    { id: 'image', title: 'עורך תמונות', icon: 'image', desc: 'ערוך וצור תמונות עם AI', path: '/tool/image', active:
+    false },
+    { id: 'video', title: 'יוצר וידאו', icon: 'video', desc: 'הפוך טקסט לסרטונים מרהיבים', path: '/tool/video', active:
+    false },
+    { id: 'story', title: 'מספר סיפורים', icon: 'book-open', desc: 'כתוב סיפורים ותסריטים יצירתיים', path:
+    '/tool/story', active: false },
+    ];
+
+    return (
+    <div className="dashboard-page">
+        <nav className="navbar glass-panel">
+            <div className="nav-brand">
+                <Icon name="sparkles" size={24} style={{ marginRight: '0.5rem' , color: '#ec4899' }} />
+                Avan <span style={{ fontSize: '0.9rem' , opacity: 0.7, marginLeft: '0.5rem' }}>Hub</span>
+            </div>
+            <div className="nav-actions">
+                <button className="nav-btn" title="הגדרות">
+                    <Icon name="settings" size={20} />
+                </button>
+                <button className="nav-btn" title="התנתקות" onClick={()=> navigate('/')}>
+                    <Icon name="log-out" size={20} />
+                </button>
+            </div>
+        </nav>
+        <div className="hub-container">
+            <div className="hub-header">
+                <h1>ברוך הבא לאוואן</h1>
+                <p>בחר את הכלי שברצונך להשתמש בו היום</p>
+            </div>
+            <div className="tools-grid">
+                {tools.map((tool) => (
+                <div key={tool.id} className={`tool-card ${!tool.active ? 'disabled' : '' }`} onClick={()=> tool.active
+                    && navigate(tool.path)}>
+                    color: white;
+                    }
+                    </style>
+                    const [fontSize, setFontSize] = useState(100);
+                    const [contrast, setContrast] = useState('normal');
+
+                    useEffect(() => {
+                    document.documentElement.style.fontSize = `${fontSize}%`;
+                    document.body.classList.remove('high-contrast');
+                    if (contrast === 'high') {
+                    document.body.classList.add('high-contrast');
+                    }
+                    }, [fontSize, contrast]);
+
+                    const resetSettings = () => {
+                    setFontSize(100);
+                    setContrast('normal');
+                    };
+
+                    return (
+                    <div className="accessibility-widget">
+                        <button className="accessibility-toggle" onClick={()=> setIsOpen(!isOpen)} aria-label="תפריט
+                            נגישות">
+                            <Icon name="accessibility" />
+                        </button>
+                        {isOpen && (
                         <div className="accessibility-menu">
                             <div className="menu-header">
                                 <h3>כלי נגישות</h3>
-                                <button onClick={() => setIsOpen(false)}><Icon name="x" size={20} /></button>
+                                <button onClick={()=> setIsOpen(false)}>
+                                    <Icon name="x" size={20} />
+                                </button>
                             </div>
                             <div className="menu-section">
                                 <label>גודל טקסט</label>
                                 <div className="controls">
-                                    <button onClick={() => setFontSize(prev => Math.max(80, prev - 10))}>A-</button>
+                                    <button onClick={()=> setFontSize(prev => Math.max(80, prev - 10))}>A-</button>
                                     <span>{fontSize}%</span>
-                                    <button onClick={() => setFontSize(prev => Math.min(150, prev + 10))}>A+</button>
+                                    <button onClick={()=> setFontSize(prev => Math.min(150, prev + 10))}>A+</button>
                                 </div>
                             </div>
                             <div className="menu-section">
                                 <label>ניגודיות</label>
                                 <div className="controls">
-                                    <button className={contrast === 'normal' ? 'active' : ''} onClick={() => setContrast('normal')}>רגילה</button>
-                                    <button className={contrast === 'high' ? 'active' : ''} onClick={() => setContrast('high')}>גבוהה</button>
+                                    <button className={contrast==='normal' ? 'active' : '' } onClick={()=>
+                                        setContrast('normal')}>רגילה</button>
+                                    <button className={contrast==='high' ? 'active' : '' } onClick={()=>
+                                        setContrast('high')}>גבוהה</button>
                                 </div>
                             </div>
                             <div className="menu-actions">
-                                <button className="btn-reset" onClick={resetSettings}><Icon name="refresh-cw" size={16} /> איפוס הגדרות</button>
+                                <button className="btn-reset" onClick={resetSettings}>
+                                    <Icon name="refresh-cw" size={16} /> איפוס הגדרות
+                                </button>
                                 <Link to="/accessibility-statement" className="btn-statement">הצהרת נגישות</Link>
                             </div>
                         </div>
-                    )}
-                </div>
-            );
-        };
+                        )}
+                    </div>
+                    );
+                    };
 
-        const LandingPage = () => {
-            const navigate = useNavigate();
-            const [activeFeature, setActiveFeature] = useState(null);
-            const features = [
-                { id: 'story', title: 'יצירת סיפורים', desc: 'תן לאוואן ליצור עבורך עולמות קסומים וסיפורים מרתקים בהתאמה אישית.' },
-                { id: 'image', title: 'יצירת תמונות', desc: 'הפוך את הדמיון למציאות עם מחולל התמונות המתקדם שלנו.' },
-                { id: 'edit', title: 'עריכת תמונות', desc: 'כלים מקצועיים לעריכה ושיפור תמונות בקלות ובמהירות.' },
-                { id: 'code', title: 'יצירת קוד', desc: 'עוזר תכנות חכם לכתיבת קוד נקי, יעיל ומהיר.' },
-                { id: 'bot', title: 'בוט AI', desc: 'בן שיחה אינטליגנטי לכל שאלה, בעיה או סתם בשביל הכיף.' },
-            ];
-            const handleFeatureClick = (feature) => setActiveFeature(feature);
-            const closeModal = () => setActiveFeature(null);
-            const handleGuestEntry = () => navigate('/terms');
+                    const LandingPage = () => {
+                    const navigate = useNavigate();
+                    const [activeFeature, setActiveFeature] = useState(null);
+                    const features = [
+                    { id: 'story', title: 'יצירת סיפורים', desc: 'תן לאוואן ליצור עבורך עולמות קסומים וסיפורים מרתקים
+                    בהתאמה אישית.' },
+                    { id: 'image', title: 'יצירת תמונות', desc: 'הפוך את הדמיון למציאות עם מחולל התמונות המתקדם שלנו.'
+                    },
+                    { id: 'edit', title: 'עריכת תמונות', desc: 'כלים מקצועיים לעריכה ושיפור תמונות בקלות ובמהירות.' },
+                    { id: 'code', title: 'יצירת קוד', desc: 'עוזר תכנות חכם לכתיבת קוד נקי, יעיל ומהיר.' },
+                    { id: 'bot', title: 'בוט AI', desc: 'בן שיחה אינטליגנטי לכל שאלה, בעיה או סתם בשביל הכיף.' },
+                    ];
+                    const handleFeatureClick = (feature) => setActiveFeature(feature);
+                    const closeModal = () => setActiveFeature(null);
+                    const handleGuestEntry = () => navigate('/terms');
 
-            return (
-                <div className="landing-page">
-                    <section className="hero">
-                        <div className="hero-bg">
-                            <div className="blob blob-1"></div>
-                            <div className="blob blob-2"></div>
-                            <div className="blob blob-3"></div>
-                        </div>
-                        <div className="hero-content">
-                            <h1 className="title-ivan">Avan</h1>
-                            <div className="cards-container">
-                                {features.map((feature) => (
-                                    <div key={feature.id} className="feature-card" onClick={() => handleFeatureClick(feature)}>
+                    return (
+                    <div className="landing-page">
+                        <section className="hero">
+                            <div className="hero-bg">
+                                <div className="blob blob-1"></div>
+                                <div className="blob blob-2"></div>
+                                <div className="blob blob-3"></div>
+                            </div>
+                            <div className="hero-content">
+                                <h1 className="title-ivan">Avan</h1>
+                                <div className="cards-container">
+                                    {features.map((feature) => (
+                                    <div key={feature.id} className="feature-card" onClick={()=>
+                                        handleFeatureClick(feature)}>
                                         {feature.title}
                                     </div>
-                                ))}
-                            </div>
-                            <div className="auth-buttons">
-                                <div className="auth-row">
-                                    <button className="btn btn-primary" onClick={() => navigate('/login')}>התחברות</button>
-                                    <button className="btn btn-outline" onClick={() => navigate('/signup')}>הרשמה</button>
+                                    ))}
                                 </div>
-                                <button className="btn btn-guest" onClick={handleGuestEntry}>היכנס כאורח</button>
+                                <div className="auth-buttons">
+                                    <div className="auth-row">
+                                        <button className="btn btn-primary" onClick={()=>
+                                            navigate('/login')}>התחברות</button>
+                                        <button className="btn btn-outline" onClick={()=>
+                                            navigate('/signup')}>הרשמה</button>
+                                    </div>
+                                    <button className="btn btn-guest" onClick={handleGuestEntry}>היכנס כאורח</button>
+                                </div>
                             </div>
-                        </div>
-                    </section>
-                    {activeFeature && (
+                        </section>
+                        {activeFeature && (
                         <div className="modal-overlay" onClick={closeModal}>
-                            <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-                                <button className="modal-close" onClick={closeModal}><Icon name="x" size={24} /></button>
+                            <div className="modal-content" onClick={(e)=> e.stopPropagation()}>
+                                <button className="modal-close" onClick={closeModal}>
+                                    <Icon name="x" size={24} />
+                                </button>
                                 <h3>{activeFeature.title}</h3>
                                 <p>{activeFeature.desc}</p>
                             </div>
                         </div>
-                    )}
-                </div>
-            );
-        };
+                        )}
+                    </div>
+                    );
+                    };
 
-        const TermsPage = () => {
-            const navigate = useNavigate();
-            const placeholderSection = "תנאים משפטיים נוספים... ".repeat(500);
-            const legalText = `תנאי שימוש והסכם משפטי - אוואן AI\n\n1. מבוא\nברוכים הבאים לאוואן AI. השימוש באתר זה כפוף לתנאים המפורטים להלן. אנא קרא אותם בעיון רב. השימוש באתר מהווה הסכמה מלאה לכל התנאים הללו.\n\n2. הגבלת אחריות\nהחברה אינה אחראית לכל נזק, ישיר או עקיף, שייגרם כתוצאה משימוש בשירותי הבינה המלאכותית.\nהמשתמש מצהיר כי הוא מודע לכך שהשירותים מבוססים על טכנולוגיה ניסיונית ועשויים להכיל טעויות, אי-דיוקים או תוכן שאינו הולם.\nהחברה לא תישא באחריות על אובדן מידע, נזקים למכשיר הקצה, או כל נזק אחר.\n\n3. וויתור על תביעות\nהמשתמש מוותר בזאת באופן בלתי חוזר על כל זכות תביעה, דרישה או טענה כלפי החברה, מנהליה, עובדיה, ספקיה או מי מטעמה.\nלא ניתן לתבוע את החברה בגין שום סיבה שהיא, כולל אך לא רק: אובדן נתונים, תוצאות לא מדויקות, הפרת זכויות יוצרים על ידי ה-AI, או עוגמת נפש.\n\n4. קניין רוחני\nכל הזכויות שמורות לאוואן AI. אין להעתיק, לשכפל, להפיץ, לשדר, להציג בפומבי או ליצור יצירות נגזרות מתכנים מהאתר ללא אישור בכתב ומראש מהחברה.\nהתוצרים הנוצרים על ידי ה-AI עשויים להיות כפופים לזכויות יוצרים של צדדים שלישיים או של החברה, והמשתמש אחראי לוודא את זכויות השימוש בהם.\n\n5. פרטיות ואבטחת מידע\nאנו מכבדים את פרטיותך. עם זאת, שיחות עם הבוט, תמונות שנוצרו וקוד שנכתב עשויים להישמר לצורכי שיפור השירות, אימון המודלים ובקרת איכות.\nהמשתמש מסכים לכך שהמידע שהוא מזין לאתר אינו סודי ועשוי להיות חשוף לצדדים שלישיים במסגרת תפעול השירות.\n\n6. שינויים בתנאים\nהחברה שומרת לעצמה את הזכות לשנות את התנאים בכל עת ללא הודעה מוקדמת. באחריות המשתמש להתעדכן בתנאים מעת לעת.\n\n${placeholderSection}\n\n7. סמכות שיפוט\nעל תנאים אלו יחולו דיני מדינת ישראל בלבד. סמכות השיפוט הבלעדית בכל עניין הקשור לאתר או לתנאים אלו נתונה לבתי המשפט המוסמכים בתל אביב-יפו.\n\n8. הסכמה\nבלחיצה על "הסכם להכל", אתה מאשר שקראת, הבנת והסכמת לכל התנאים הנ"ל, כולל סעיפי הגבלת האחריות והוויתור על תביעות.`;
-            return (
-                <div className="terms-page">
-                    <div className="terms-container">
-                        <div className="terms-header">
-                            <h1>צור תנאים</h1>
-                            <p>אנא אשר את התנאים והמדיניות כדי להמשיך</p>
-                        </div>
-                        <div className="terms-content">{legalText}</div>
-                        <div className="terms-actions">
-                            <button className="btn-agree" onClick={() => navigate('/home')}>הסכם להכל</button>
-                            <div className="btn-close-container">
-                                <button className="btn-close" onClick={() => navigate('/')}>
-                                    <span>יציאה</span>
-                                    <Icon name="x" size={24} />
-                                </button>
+                    const TermsPage = () => {
+                    const navigate = useNavigate();
+                    const placeholderSection = "תנאים משפטיים נוספים... ".repeat(500);
+                    const legalText = `תנאי שימוש והסכם משפטי - אוואן AI\n\n1. מבוא\nברוכים הבאים לאוואן AI. השימוש באתר
+                    זה כפוף לתנאים
+                    המפורטים להלן. אנא קרא אותם בעיון רב. השימוש באתר מהווה הסכמה מלאה לכל התנאים הללו.\n\n2. הגבלת
+                    אחריות\nהחברה אינה
+                    אחראית לכל נזק, ישיר או עקיף, שייגרם כתוצאה משימוש בשירותי הבינה המלאכותית.\nהמשתמש מצהיר כי הוא
+                    מודע לכך שהשירותים
+                    מבוססים על טכנולוגיה ניסיונית ועשויים להכיל טעויות, אי-דיוקים או תוכן שאינו הולם.\nהחברה לא תישא
+                    באחריות על אובדן
+                    מידע, נזקים למכשיר הקצה, או כל נזק אחר.\n\n3. וויתור על תביעות\nהמשתמש מוותר בזאת באופן בלתי חוזר על
+                    כל זכות תביעה,
+                    דרישה או טענה כלפי החברה, מנהליה, עובדיה, ספקיה או מי מטעמה.\nלא ניתן לתבוע את החברה בגין שום סיבה
+                    שהיא, כולל אך לא
+                    רק: אובדן נתונים, תוצאות לא מדויקות, הפרת זכויות יוצרים על ידי ה-AI, או עוגמת נפש.\n\n4. קניין
+                    רוחני\nכל הזכויות
+                    שמורות לאוואן AI. אין להעתיק, לשכפל, להפיץ, לשדר, להציג בפומבי או ליצור יצירות נגזרות מתכנים מהאתר
+                    ללא אישור בכתב
+                    ומראש מהחברה.\nהתוצרים הנוצרים על ידי ה-AI עשויים להיות כפופים לזכויות יוצרים של צדדים שלישיים או של
+                    החברה, והמשתמש
+                    אחראי לוודא את זכויות השימוש בהם.\n\n5. פרטיות ואבטחת מידע\nאנו מכבדים את פרטיותך. עם זאת, שיחות עם
+                    הבוט, תמונות
+                    שנוצרו וקוד שנכתב עשויים להישמר לצורכי שיפור השירות, אימון המודלים ובקרת איכות.\nהמשתמש מסכים לכך
+                    שהמידע שהוא מזין
+                    לאתר אינו סודי ועשוי להיות חשוף לצדדים שלישיים במסגרת תפעול השירות.\n\n6. שינויים בתנאים\nהחברה
+                    שומרת לעצמה את הזכות
+                    לשנות את התנאים בכל עת ללא הודעה מוקדמת. באחריות המשתמש להתעדכן בתנאים מעת
+                    לעת.\n\n${placeholderSection}\n\n7. סמכות
+                    שיפוט\nעל תנאים אלו יחולו דיני מדינת ישראל בלבד. סמכות השיפוט הבלעדית בכל עניין הקשור לאתר או לתנאים
+                    אלו נתונה לבתי
+                    המשפט המוסמכים בתל אביב-יפו.\n\n8. הסכמה\nבלחיצה על "הסכם להכל", אתה מאשר שקראת, הבנת והסכמת לכל
+                    התנאים הנ"ל, כולל
+                    סעיפי הגבלת האחריות והוויתור על תביעות.`;
+                    return (
+                    <div className="terms-page">
+                        <div className="terms-container">
+                            <div className="terms-header">
+                                <h1>צור תנאים</h1>
+                                <p>אנא אשר את התנאים והמדיניות כדי להמשיך</p>
+                            </div>
+                            <div className="terms-content">{legalText}</div>
+                            <div className="terms-actions">
+                                <button className="btn-agree" onClick={()=> navigate('/home')}>הסכם להכל</button>
+                                <div className="btn-close-container">
+                                    <button className="btn-close" onClick={()=> navigate('/')}>
+                                        <span>יציאה</span>
+                                        <Icon name="x" size={24} />
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
-            );
-        };
+                    );
+                    };
 
-        const DashboardPage = () => {
-            const navigate = useNavigate();
-            const tools = [
-                { id: 'code', title: 'מחולל קוד', icon: 'code', desc: 'צור קוד, אתרים ואפליקציות במהירות', path: '/tool/code', active: true },
-                { id: 'image', title: 'עורך תמונות', icon: 'image', desc: 'ערוך וצור תמונות עם AI', path: '/tool/image', active: false },
-                { id: 'video', title: 'יוצר וידאו', icon: 'video', desc: 'הפוך טקסט לסרטונים מרהיבים', path: '/tool/video', active: false },
-                { id: 'story', title: 'מספר סיפורים', icon: 'book-open', desc: 'כתוב סיפורים ותסריטים יצירתיים', path: '/tool/story', active: false },
-            ];
+                    const DashboardPage = () => {
+                    const navigate = useNavigate();
+                    const tools = [
+                    { id: 'code', title: 'מחולל קוד', icon: 'code', desc: 'צור קוד, אתרים ואפליקציות במהירות', path:
+                    '/tool/code',
+                    active: true },
+                    { id: 'image', title: 'עורך תמונות', icon: 'image', desc: 'ערוך וצור תמונות עם AI', path:
+                    '/tool/image', active:
+                    true },
+                    { id: 'video', title: 'יוצר וידאו', icon: 'video', desc: 'הפוך טקסט לסרטונים מרהיבים', path:
+                    '/tool/video', active:
+                    false },
+                    { id: 'story', title: 'מספר סיפורים', icon: 'book-open', desc: 'כתוב סיפורים ותסריטים יצירתיים',
+                    path:
+                    '/tool/story', active: false },
+                    ];
 
-            return (
-                <div className="dashboard-page">
-                    <nav className="navbar glass-panel">
-                        <div className="nav-brand">
-                            <Icon name="sparkles" size={24} style={{ marginRight: '0.5rem', color: '#ec4899' }} />
-                            Avan <span style={{ fontSize: '0.9rem', opacity: 0.7, marginLeft: '0.5rem' }}>Hub</span>
-                        </div>
-                        <div className="nav-actions">
-                            <button className="nav-btn" title="הגדרות"><Icon name="settings" size={20} /></button>
-                            <button className="nav-btn" title="התנתקות" onClick={() => navigate('/')}><Icon name="log-out" size={20} /></button>
-                        </div>
-                    </nav>
-                    <div className="hub-container">
-                        <div className="hub-header">
-                            <h1>ברוך הבא לאוואן</h1>
-                            <p>בחר את הכלי שברצונך להשתמש בו היום</p>
-                        </div>
-                        <div className="tools-grid">
-                            {tools.map((tool) => (
-                                <div key={tool.id} className={`tool-card ${!tool.active ? 'disabled' : ''}`} onClick={() => tool.active && navigate(tool.path)}>
-                                    <div className="tool-icon"><Icon name={tool.icon} size={40} /></div>
+                    return (
+                    <div className="dashboard-page">
+                        <nav className="navbar glass-panel">
+                            <div className="nav-brand">
+                                <Icon name="sparkles" size={24} style={{ marginRight: '0.5rem' , color: '#ec4899' }} />
+                                Avan <span style={{ fontSize: '0.9rem' , opacity: 0.7, marginLeft: '0.5rem'
+                                    }}>Hub</span>
+                            </div>
+                            <div className="nav-actions">
+                                <button className="nav-btn" title="הגדרות">
+                                    <Icon name="settings" size={20} />
+                                </button>
+                                <button className="nav-btn" title="התנתקות" onClick={()=> navigate('/')}>
+                                    <Icon name="log-out" size={20} />
+                                </button>
+                            </div>
+                        </nav>
+                        <div className="hub-container">
+                            <div className="hub-header">
+                                <h1>ברוך הבא לאוואן</h1>
+                                <p>בחר את הכלי שברצונך להשתמש בו היום</p>
+                            </div>
+                            <div className="tools-grid">
+                                {tools.map((tool) => (
+                                <div key={tool.id} className={`tool-card ${!tool.active ? 'disabled' : '' }`}
+                                    onClick={()=> tool.active
+                                    && navigate(tool.path)}>
+                                    <div className="tool-icon">
+                                        <Icon name={tool.icon} size={40} />
+                                    </div>
                                     <h3>{tool.title}</h3>
                                     <p>{tool.desc}</p>
                                     {!tool.active && <span className="badge-coming-soon">בקרוב</span>}
                                 </div>
-                            ))}
+                                ))}
+                            </div>
                         </div>
                     </div>
-                </div>
-            );
-        };
+                    );
+                    };
 
-        const CodeToolPage = () => {
-            const navigate = useNavigate();
-            const [messages, setMessages] = useState([
-                { type: 'bot', content: 'שלום! אני אוואן (Gemini 3). אני כאן כדי לעזור לך ליצור דברים מדהימים.' }
-            ]);
-            const [inputMessage, setInputMessage] = useState('');
-            const [previewContent, setPreviewContent] = useState(null);
-            const [isThinking, setIsThinking] = useState(false);
-            const [showAd, setShowAd] = useState(false);
-            const [adTimer, setAdTimer] = useState(5);
-            const isGuest = true;
+                    const CodeToolPage = () => {
+                    const navigate = useNavigate();
+                    const [messages, setMessages] = useState([
+                    { type: 'bot', content: 'שלום! אני אוואן (Gemini 3). אני כאן כדי לעזור לך ליצור דברים מדהימים.' }
+                    ]);
+                    const [inputMessage, setInputMessage] = useState('');
+                    const [previewContent, setPreviewContent] = useState(null);
+                    const [isThinking, setIsThinking] = useState(false);
+                    const [showAd, setShowAd] = useState(false);
+                    const [adTimer, setAdTimer] = useState(5);
+                    const isGuest = true;
 
-            const particles = Array.from({ length: 20 }).map((_, i) => ({
-                id: i,
-                left: `${Math.random() * 100}%`,
-                animationDuration: `${10 + Math.random() * 20}s`,
-                animationDelay: `${Math.random() * 5}s`,
-                width: `${5 + Math.random() * 10}px`,
-                height: `${5 + Math.random() * 10}px`
-            }));
+                    const particles = Array.from({ length: 20 }).map((_, i) => ({
+                    id: i,
+                    left: `${Math.random() * 100}%`,
+                    animationDuration: `${10 + Math.random() * 20}s`,
+                    animationDelay: `${Math.random() * 5}s`,
+                    width: `${5 + Math.random() * 10}px`,
+                    height: `${5 + Math.random() * 10}px`
+                    }));
 
-            const handleSendMessage = (e) => {
-                e.preventDefault();
-                if (!inputMessage.trim()) return;
-                const newMessages = [...messages, { type: 'user', content: inputMessage }];
-                setMessages(newMessages);
-                setInputMessage('');
-                setIsThinking(true);
+                    const handleSendMessage = (e) => {
+                    e.preventDefault();
+                    if (!inputMessage.trim()) return;
+                    const newMessages = [...messages, { type: 'user', content: inputMessage }];
+                    setMessages(newMessages);
+                    setInputMessage('');
+                    setIsThinking(true);
 
-                if (isGuest && (inputMessage.includes('קוד') || inputMessage.includes('אתר') || Math.random() > 0.7)) {
+                    if (isGuest && (inputMessage.includes('קוד') || inputMessage.includes('אתר') || Math.random() >
+                    0.7)) {
                     setShowAd(true);
                     setAdTimer(5);
-                }
+                    }
 
-                setTimeout(() => {
+                    setTimeout(() => {
                     let botResponse = { type: 'bot', content: 'מעבד נתונים...' };
                     if (inputMessage.includes('קוד') || inputMessage.includes('אתר')) {
-                        botResponse.content = 'יצרתי עבורך את הקוד המבוקש באמצעות מודל Gemini 3 המתקדם. אנא בדוק את התצוגה המקדימה.';
-                        setPreviewContent({
-                            type: 'code',
-                            code: `// Generated by Avan (Gemini 3)\nfunction createMagic() {\n  const element = document.createElement('div');\n  element.style.background = 'linear-gradient(45deg, #ff00cc, #3333ff)';\n  element.style.padding = '20px';\n  element.style.borderRadius = '10px';\n  element.style.color = 'white';\n  element.innerHTML = '✨ Magic Happened! ✨';\n  document.body.appendChild(element);\n}`
-                        });
+                    botResponse.content = 'יצרתי עבורך את הקוד המבוקש באמצעות מודל Gemini 3 המתקדם. אנא בדוק את התצוגה
+                    המקדימה.';
+                    setPreviewContent({
+                    type: 'code',
+                    code: `// Generated by Avan (Gemini 3)\nfunction createMagic() {\n const element =
+                    document.createElement('div');\n
+                    element.style.background = 'linear-gradient(45deg, #ff00cc, #3333ff)';\n element.style.padding =
+                    '20px';\n
+                    element.style.borderRadius = '10px';\n element.style.color = 'white';\n element.innerHTML = '✨ Magic
+                    Happened! ✨';\n
+                    document.body.appendChild(element);\n}`
+                    });
                     } else {
-                        botResponse.content = 'זו שאלה מצוינת. כמודל שפה מתקדם, אני יכול לנתח את הבקשה שלך ולומר ש... (כאן תבוא תשובה חכמה ומפורטת)';
+                    botResponse.content = 'זו שאלה מצוינת. כמודל שפה מתקדם, אני יכול לנתח את הבקשה שלך ולומר ש... (כאן
+                    תבוא תשובה חכמה
+                    ומפורטת)';
                     }
                     setMessages([...newMessages, botResponse]);
                     setIsThinking(false);
-                }, 3000);
-            };
+                    }, 3000);
+                    };
 
-            useEffect(() => {
-                let interval;
-                if (showAd && adTimer > 0) {
+                    useEffect(() => {
+                    let interval;
+                    if (showAd && adTimer > 0) {
                     interval = setInterval(() => setAdTimer(prev => prev - 1), 1000);
-                }
-                return () => clearInterval(interval);
-            }, [showAd, adTimer]);
+                    }
+                    return () => clearInterval(interval);
+                    }, [showAd, adTimer]);
 
-            const handleLogout = () => navigate('/');
+                    const handleLogout = () => navigate('/');
 
-            return (
-                <div className="home-page">
-                    <div className="particles-container">
-                        {particles.map(p => (
-                            <div key={p.id} className="particle" style={{
-                                left: p.left, width: p.width, height: p.height,
-                                animationDuration: p.animationDuration, animationDelay: p.animationDelay
-                            }}></div>
-                        ))}
-                    </div>
-                    <nav className="navbar glass-panel">
-                        <div className="nav-brand">
-                            <button className="nav-btn" onClick={() => navigate('/home')} style={{ marginLeft: '1rem' }}>
-                                <Icon name="arrow-right" size={20} />
-                            </button>
-                            <Icon name="sparkles" size={20} style={{ marginRight: '0.5rem', color: '#ec4899' }} />
-                            Avan <span style={{ fontSize: '0.8rem', opacity: 0.7, marginLeft: '0.5rem' }}>Code Studio</span>
+                    return (
+                    <div className="home-page">
+                        <div className="particles-container">
+                            {particles.map(p => (
+                            <div key={p.id} className="particle" style={{ left: p.left, width: p.width, height:
+                                p.height, animationDuration: p.animationDuration, animationDelay: p.animationDelay }}>
+                            </div>
+                            ))}
                         </div>
-                        <div className="nav-actions">
-                            <button className="nav-btn" title="שמירה בענן"><Icon name="cloud" size={20} /></button>
-                            <button className="nav-btn" title="הגדרות"><Icon name="settings" size={20} /></button>
-                            <button className="nav-btn" title="התנתקות" onClick={handleLogout}><Icon name="log-out" size={20} /></button>
-                        </div>
-                    </nav>
-                    <div className="dashboard-container">
-                        <div className="preview-area">
-                            {showAd && (
+                        <nav className="navbar glass-panel">
+                            <div className="nav-brand">
+                                <button className="nav-btn" onClick={()=> navigate('/home')} style={{ marginLeft: '1rem'
+                                    }}>
+                                    <Icon name="arrow-right" size={20} />
+                                </button>
+                                <Icon name="sparkles" size={20} style={{ marginRight: '0.5rem' , color: '#ec4899' }} />
+                                Avan <span style={{ fontSize: '0.8rem' , opacity: 0.7, marginLeft: '0.5rem' }}>Code
+                                    Studio</span>
+                            </div>
+                            <div className="nav-actions">
+                                <button className="nav-btn" title="שמירה בענן">
+                                    <Icon name="cloud" size={20} />
+                                </button>
+                                <button className="nav-btn" title="הגדרות">
+                                    <Icon name="settings" size={20} />
+                                </button>
+                                <button className="nav-btn" title="התנתקות" onClick={handleLogout}>
+                                    <Icon name="log-out" size={20} />
+                                </button>
+                            </div>
+                        </nav>
+                        <div className="dashboard-container">
+                            <div className="preview-area">
+                                {showAd && (
                                 <div className="ad-overlay">
                                     <div className="ad-content">
                                         <div className="ad-badge">פרסומת</div>
                                         <h2 className="ad-title">שדרג ל-Pro!</h2>
-                                        <p className="ad-text">רוצה לייצר קוד ללא המתנה וללא פרסומות? קבל גישה למודל Gemini 4 Ultra החדש.</p>
-                                        <button className="ad-btn" onClick={() => setShowAd(false)}>
+                                        <p className="ad-text">רוצה לייצר קוד ללא המתנה וללא פרסומות? קבל גישה למודל
+                                            Gemini 4 Ultra
+                                            החדש.</p>
+                                        <button className="ad-btn" onClick={()=> setShowAd(false)}>
                                             {adTimer > 0 ? `אפשר לסגור בעוד ${adTimer}...` : 'סגור פרסומת'}
                                         </button>
                                         <div className="ad-timer">Avan Ads System</div>
                                     </div>
                                 </div>
-                            )}
-                            <div className="preview-header">
-                                <div className="preview-title"><Icon name="monitor" size={16} /> תצוגה מקדימה</div>
-                                <div className="preview-actions">
-                                    <button className="action-btn" title="העתק קוד"><Icon name="copy" size={14} /> העתק</button>
-                                    <button className="action-btn" title="נסה שוב"><Icon name="rotate-ccw" size={14} /></button>
-                                    <button className="action-btn" title="שינוי פורמט"><Icon name="layout" size={14} /></button>
+                                )}
+                                <div className="preview-header">
+                                    <div className="preview-title">
+                                        <Icon name="monitor" size={16} /> תצוגה מקדימה
+                                    </div>
+                                    <div className="preview-actions">
+                                        <button className="action-btn" title="העתק קוד">
+                                            <Icon name="copy" size={14} /> העתק
+                                        </button>
+                                        <button className="action-btn" title="נסה שוב">
+                                            <Icon name="rotate-ccw" size={14} />
+                                        </button>
+                                        <button className="action-btn" title="שינוי פורמט">
+                                            <Icon name="layout" size={14} />
+                                        </button>
+                                    </div>
+                                </div>
+                                <div className="preview-content">
+                                    {isThinking && !showAd ? (
+                                    <div className="empty-state">
+                                        <div className="spinner" style={{ width: '40px' , height: '40px' ,
+                                            border: '4px solid #f3f3f3' , borderTop: '4px solid #3b82f6' ,
+                                            borderRadius: '50%' , animation: 'spin 1s linear infinite' }}></div>
+                                        <p>Gemini 3 חושב...</p>
+                                        <style>
+                                            {
+                                                `@keyframes spin {
+                                                    0% {
+                                                        transform: rotate(0deg);
+                                                    }
+
+                                                    100% {
+                                                        transform: rotate(360deg);
+                                                    }
+                                                }
+
+                                                `
+                                            }
+                                        </style>
+                                    </div>
+                                    ) : previewContent ? (
+                                    <pre style={{ textAlign: 'left' , direction: 'ltr'
+                                        }}><code>{previewContent.code}</code></pre>
+                                    ) : (
+                                    <div className="empty-state">
+                                        <Icon name="code" size={48} />
+                                        <p>הקוד שלך יופיע כאן</p>
+                                    </div>
+                                    )}
                                 </div>
                             </div>
-                            <div className="preview-content">
-                                {isThinking && !showAd ? (
-                                    <div className="empty-state">
-                                        <div className="spinner" style={{ width: '40px', height: '40px', border: '4px solid #f3f3f3', borderTop: '4px solid #3b82f6', borderRadius: '50%', animation: 'spin 1s linear infinite' }}></div>
-                                        <p>Gemini 3 חושב...</p>
-                                        <style>{`@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }`}</style>
-                                    </div>
-                                ) : previewContent ? (
-                                    <pre style={{ textAlign: 'left', direction: 'ltr' }}><code>{previewContent.code}</code></pre>
-                                ) : (
-                                    <div className="empty-state"><Icon name="code" size={48} /><p>הקוד שלך יופיע כאן</p></div>
-                                )}
-                            </div>
-                        </div>
-                        <div className="chat-interface glass-panel">
-                            <div className="chat-messages">
-                                {messages.map((msg, index) => (
+                            <div className="chat-interface glass-panel">
+                                <div className="chat-messages">
+                                    {messages.map((msg, index) => (
                                     <div key={index} className={`message ${msg.type}`}>
                                         <div className={`avatar ${msg.type}`}>
-                                            {msg.type === 'user' ? <Icon name="user" size={20} /> : <Icon name="bot" size={20} />}
+                                            {msg.type === 'user' ?
+                                            <Icon name="user" size={20} /> :
+                                            <Icon name="bot" size={20} />}
                                         </div>
                                         <div className="bubble">{msg.content}</div>
                                     </div>
-                                ))}
-                                {isThinking && (
+                                    ))}
+                                    {isThinking && (
                                     <div className="message bot">
-                                        <div className="avatar bot"><Icon name="bot" size={20} /></div>
+                                        <div className="avatar bot">
+                                            <Icon name="bot" size={20} />
+                                        </div>
                                         <div className="bubble" style={{ opacity: 0.7 }}>...</div>
                                     </div>
+                                    )}
+                                </div>
+                                <div className="chat-input-area">
+                                    <form className="input-wrapper" onSubmit={handleSendMessage}>
+                                        <input type="text" className="chat-input" placeholder="כתוב הודעה ל-Gemini 3..."
+                                            value={inputMessage} onChange={(e)=> setInputMessage(e.target.value)} />
+                                        <button type="submit" className="send-btn">
+                                            <Icon name="send" size={20} />
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                            </button>
+                            <h2>הרשמה לאוואן</h2>
+                            <form onSubmit={(e)=> { e.preventDefault(); navigate('/terms'); }}>
+                                <input type="text" placeholder="שם מלא" required />
+                                <input type="email" placeholder="אימייל" required />
+                                <input type="password" placeholder="סיסמה" required />
+                                <button type="submit" className="btn-auth">הירשם</button>
+                            </form>
+                            <div className="auth-divider"><span>או</span></div>
+                            <div className="social-buttons">
+                                <button className="btn-social"><img
+                                        src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google"
+                                        width="20" /> הרשמה עם Google</button>
+                                <button className="btn-social"><img
+                                        src="https://www.svgrepo.com/show/475638/apple-color.svg" alt="Apple"
+                                        width="20" /> הרשמה עם Apple</button>
+                            </div>
+                            <p>כבר רשום?
+                                <Link to="/login">התחבר כאן</Link>
+                            </p>
+                        </div>
+                    </div>
+                    );
+                    };
+
+                    const AccessibilityStatement = () => {
+                    const navigate = useNavigate();
+                    return (
+                    <div style={{ padding: '2rem' , maxWidth: '800px' , margin: '0 auto' }}>
+                        <button onClick={()=> navigate(-1)} style={{ display: 'flex', alignItems: 'center', gap:
+                            '0.5rem', marginBottom:
+                            '2rem', border: 'none', background: 'none', cursor: 'pointer', fontSize: '1.1rem' }}>
+                            <Icon name="arrow-right" /> חזרה
+                        </button>
+                        <h1>הצהרת נגישות</h1>
+                        <p>אייבן AI מחויבת לספק אתר נגיש לקהל הרחב ככל האפשר, ללא קשר לטכנולוגיה או ליכולת פיזית.</p>
+                        <h2>רמת הנגישות</h2>
+                        <p>אתר זה עומד בדרישות תקנות שוויון זכויות לאנשים עם מוגבלות (התאמות נגישות לשירות), התשע"ג
+                            2013.</p>
+                        <p>התאמות הנגישות בוצעו עפ"י המלצות התקן הישראלי (ת"י 5568) לנגישות תכנים באינטרנט ברמת AA ומסמך
+                            WCAG2.0
+                            הבינלאומי.</p>
+                        <h2>תיקונים והתאמות שבוצעו</h2>
+                        <ul>
+                            <li>האתר מותאם לכל סוגי הדפדפנים המודרניים.</li>
+                            <li>האתר מותאם לכל סוגי הפלטפורמות - מובייל, טאבלטים ודסקטופ.</li>
+                            <li>האתר מותאם לאנשים עם לקות ראייה - אפשרות להגדלת טקסט ושינוי ניגודיות.</li>
+                            <li>האתר מותאם לניווט מקלדת.</li>
+                        </ul>
+                        <h2>יצירת קשר</h2>
+                        <p>אם נתקלתם בבעיה בנושא נגישות, נשמח לקבל משוב ולתקן בהקדם.</p>
+                        <p>אימייל: accessibility@ivan.ai</p>
+                    </div>
+                    );
+                    };
+
+                    /* Updated Layout for Tools */
+                    .dashboard-container {
+                    display: flex;
+                    flex-direction: row-reverse; /* Swapped sides */
+                    height: calc(100vh - 70px);
+                    overflow: hidden;
+                    }
+
+                    /* ... (rest of CSS) ... */
+
+                    const ImageToolPage = () => {
+                    const navigate = useNavigate();
+                    const [messages, setMessages] = useState([
+                    { type: 'bot', content: 'שלום! אני אוואן (Gemini 3). אני כאן כדי לעזור לך ליצור ולערוך תמונות.' }
+                    ]);
+                    const [inputMessage, setInputMessage] = useState('');
+                    const [currentImage, setCurrentImage] = useState(null);
+                    const [isThinking, setIsThinking] = useState(false);
+                    const [showAd, setShowAd] = useState(false);
+                    const [adTimer, setAdTimer] = useState(5);
+                    const [showGallery, setShowGallery] = useState(false);
+                    const [galleryImages, setGalleryImages] = useState([]);
+                    const [mode, setMode] = useState('create');
+
+                    const handleSendMessage = (e) => {
+                    e.preventDefault();
+                    if (!inputMessage.trim()) return;
+                    setMessages([...messages, { type: 'user', content: inputMessage }]);
+                    setInputMessage('');
+                    setIsThinking(true);
+
+                    if (Math.random() > 0.7) {
+                    setShowAd(true);
+                    setAdTimer(5);
+                    }
+
+                    setTimeout(() => {
+                    const mockUrl = `https://picsum.photos/800/600?random=${Math.random()}`;
+                    setCurrentImage(mockUrl);
+                    setGalleryImages(prev => [{ url: mockUrl, prompt: inputMessage }, ...prev]);
+                    setMessages(prev => [...prev, { type: 'bot', content: 'הנה התמונה שיצרתי.' }]);
+                    setIsThinking(false);
+                    }, 3000);
+                    };
+
+                    return (
+                    <div className="home-page">
+                        <nav className="navbar glass-panel">
+                            <div className="nav-brand">
+                                <button className="nav-btn" onClick={()=> navigate('/home')}>
+                                    <Icon name="arrow-right" />
+                                </button>
+                                Avan Image Studio
+                            </div>
+                            <div className="nav-actions">
+                                <button className="nav-btn" onClick={()=> setShowGallery(true)}>
+                                    <Icon name="history" />
+                                </button>
+                            </div>
+                        </nav>
+                        <div className="dashboard-container">
+                            <div className="preview-area">
+                                {showAd && (
+                                <div className="ad-overlay">
+                                    <div className="ad-content">
+                                        <h2>פרסומת</h2>
+                                        <button onClick={()=> setShowAd(false)}>סגור</button>
+                                    </div>
+                                </div>
                                 )}
+                                <div className="preview-content" style={{ display: 'flex' , justifyContent: 'center' ,
+                                    alignItems: 'center' }}>
+                                    {currentImage ? <img src={currentImage} style={{ maxWidth: '100%' ,
+                                        borderRadius: '8px' }} /> : <p>התמונה תופיע כאן (או פרסומת)</p>}
+                                </div>
                             </div>
-                            <div className="chat-input-area">
-                                <form className="input-wrapper" onSubmit={handleSendMessage}>
-                                    <input type="text" className="chat-input" placeholder="כתוב הודעה ל-Gemini 3..." value={inputMessage} onChange={(e) => setInputMessage(e.target.value)} />
-                                    <button type="submit" className="send-btn"><Icon name="send" size={20} /></button>
-                                </form>
+                            <div className="chat-interface glass-panel">
+                                <div className="chat-messages">
+                                    {messages.map((m, i) => <div key={i} className={`message ${m.type}`}>{m.content}
+                                    </div>)}
+                                </div>
+                                <div className="chat-input-area">
+                                    <form onSubmit={handleSendMessage}>
+                                        <input value={inputMessage} onChange={e=> setInputMessage(e.target.value)}
+                                        placeholder="תאר תמונה..." />
+                                    </form>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                </div>
-            );
-        };
-
-        const LoginPage = () => {
-            const navigate = useNavigate();
-            return (
-                <div className="auth-page">
-                    <div className="auth-card">
-                        <button className="btn-exit" onClick={() => navigate('/')}><Icon name="x" size={24} /></button>
-                        <h2>התחברות לאוואן</h2>
-                        <form onSubmit={(e) => { e.preventDefault(); navigate('/home'); }}>
-                            <input type="email" placeholder="אימייל" required />
-                            <input type="password" placeholder="סיסמה" required />
-                            <button type="submit" className="btn-auth">התחבר</button>
-                        </form>
-                        <div className="auth-divider"><span>או</span></div>
-                        <div className="social-buttons">
-                            <button className="btn-social"><img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google" width="20" /> התחבר עם Google</button>
-                            <button className="btn-social"><img src="https://www.svgrepo.com/show/475638/apple-color.svg" alt="Apple" width="20" /> התחבר עם Apple</button>
+                        {showGallery && (
+                        <div className="modal-overlay" onClick={()=> setShowGallery(false)}>
+                            <div className="modal-content">
+                                <h3>הגלריה שלי</h3>
+                                <div style={{ display: 'grid' , gridTemplateColumns: '1fr 1fr 1fr' , gap: '10px' }}>
+                                    {galleryImages.map((img, i) => <img key={i} src={img.url} style={{ width: '100%' }}
+                                        onClick={()=> setCurrentImage(img.url)} />)}
+                                </div>
+                            </div>
                         </div>
-                        <p>אין לך חשבון? <Link to="/signup">הירשם כאן</Link></p>
+                        )}
                     </div>
-                </div>
-            );
-        };
+                    );
+                    };
 
-        const SignupPage = () => {
-            const navigate = useNavigate();
-            return (
-                <div className="auth-page">
-                    <div className="auth-card">
-                        <button className="btn-exit" onClick={() => navigate('/')}><Icon name="x" size={24} /></button>
-                        <h2>הרשמה לאוואן</h2>
-                        <form onSubmit={(e) => { e.preventDefault(); navigate('/terms'); }}>
-                            <input type="text" placeholder="שם מלא" required />
-                            <input type="email" placeholder="אימייל" required />
-                            <input type="password" placeholder="סיסמה" required />
-                            <button type="submit" className="btn-auth">הירשם</button>
-                        </form>
-                        <div className="auth-divider"><span>או</span></div>
-                        <div className="social-buttons">
-                            <button className="btn-social"><img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google" width="20" /> הרשמה עם Google</button>
-                            <button className="btn-social"><img src="https://www.svgrepo.com/show/475638/apple-color.svg" alt="Apple" width="20" /> הרשמה עם Apple</button>
-                        </div>
-                        <p>כבר רשום? <Link to="/login">התחבר כאן</Link></p>
-                    </div>
-                </div>
-            );
-        };
+                    const App = () => {
+                    return (
+                    <HashRouter>
+                        <AccessibilityWidget />
+                        <Routes>
+                            <Route path="/" element={<LandingPage />} />
+                            <Route path="/terms" element={<TermsPage />} />
+                            <Route path="/home" element={<DashboardPage />} />
+                            <Route path="/tool/code" element={<CodeToolPage />} />
+                            <Route path="/tool/image" element={<ImageToolPage />} />
+                            <Route path="/login" element={<LoginPage />} />
+                            <Route path="/signup" element={<SignupPage />} />
+                            <Route path="/accessibility-statement" element={<AccessibilityStatement />} />
+                        </Routes>
+                    </HashRouter>
+                    );
+                    };
 
-        const AccessibilityStatement = () => {
-            const navigate = useNavigate();
-            return (
-                <div style={{ padding: '2rem', maxWidth: '800px', margin: '0 auto' }}>
-                    <button onClick={() => navigate(-1)} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '2rem', border: 'none', background: 'none', cursor: 'pointer', fontSize: '1.1rem' }}>
-                        <Icon name="arrow-right" /> חזרה
-                    </button>
-                    <h1>הצהרת נגישות</h1>
-                    <p>אייבן AI מחויבת לספק אתר נגיש לקהל הרחב ככל האפשר, ללא קשר לטכנולוגיה או ליכולת פיזית.</p>
-                    <h2>רמת הנגישות</h2>
-                    <p>אתר זה עומד בדרישות תקנות שוויון זכויות לאנשים עם מוגבלות (התאמות נגישות לשירות), התשע"ג 2013.</p>
-                    <p>התאמות הנגישות בוצעו עפ"י המלצות התקן הישראלי (ת"י 5568) לנגישות תכנים באינטרנט ברמת AA ומסמך WCAG2.0 הבינלאומי.</p>
-                    <h2>תיקונים והתאמות שבוצעו</h2>
-                    <ul>
-                        <li>האתר מותאם לכל סוגי הדפדפנים המודרניים.</li>
-                        <li>האתר מותאם לכל סוגי הפלטפורמות - מובייל, טאבלטים ודסקטופ.</li>
-                        <li>האתר מותאם לאנשים עם לקות ראייה - אפשרות להגדלת טקסט ושינוי ניגודיות.</li>
-                        <li>האתר מותאם לניווט מקלדת.</li>
-                    </ul>
-                    <h2>יצירת קשר</h2>
-                    <p>אם נתקלתם בבעיה בנושא נגישות, נשמח לקבל משוב ולתקן בהקדם.</p>
-                    <p>אימייל: accessibility@ivan.ai</p>
-                </div>
-            );
-        };
-
-        const App = () => {
-            return (
-                <HashRouter>
-                    <AccessibilityWidget />
-                    <Routes>
-                        <Route path="/" element={<LandingPage />} />
-                        <Route path="/terms" element={<TermsPage />} />
-                        <Route path="/home" element={<DashboardPage />} />
-                        <Route path="/tool/code" element={<CodeToolPage />} />
-                        <Route path="/login" element={<LoginPage />} />
-                        <Route path="/signup" element={<SignupPage />} />
-                        <Route path="/accessibility-statement" element={<AccessibilityStatement />} />
-                    </Routes>
-                </HashRouter>
-            );
-        };
-
-        const root = ReactDOM.createRoot(document.getElementById('root'));
-        root.render(<App />);
-    </script>
-</body>
+                    </script>
+                    </body>
 
 </html>
