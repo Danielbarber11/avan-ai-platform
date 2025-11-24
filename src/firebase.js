@@ -56,35 +56,43 @@ export const signInWithApple = async () => {
 };
 
 export const saveToCloud = async (collectionName, data) => {
-    if (!db) {
-        console.warn("Firestore not initialized");
-        return;
-    }
     try {
-        await addDoc(collection(db, collectionName), {
-            ...data,
-            timestamp: new Date()
-        });
-        console.log("Document written to", collectionName);
+        if (db) {
+            await addDoc(collection(db, collectionName), {
+                ...data,
+                timestamp: new Date()
+            });
+            console.log("Document written to Firestore:", collectionName);
+        } else {
+            throw new Error("Firestore not initialized");
+        }
     } catch (e) {
-        console.error("Error adding document: ", e);
-        alert("שגיאה בשמירה לענן. וודא ש-Firestore מופעל במסוף של Firebase.");
+        console.warn("Firestore save failed, falling back to Local Storage:", e);
+        // Fallback to Local Storage
+        const localData = JSON.parse(localStorage.getItem(collectionName) || '[]');
+        localData.unshift({ ...data, timestamp: new Date().toISOString() });
+        localStorage.setItem(collectionName, JSON.stringify(localData));
     }
 };
 
 export const getFromCloud = async (collectionName, userId) => {
-    if (!db) return [];
     try {
-        const q = query(
-            collection(db, collectionName), 
-            where("userId", "==", userId),
-            orderBy("timestamp", "desc")
-        );
-        const querySnapshot = await getDocs(q);
-        return querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        if (db) {
+            const q = query(
+                collection(db, collectionName), 
+                where("userId", "==", userId),
+                orderBy("timestamp", "desc")
+            );
+            const querySnapshot = await getDocs(q);
+            return querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        } else {
+            throw new Error("Firestore not initialized");
+        }
     } catch (e) {
-        console.error("Error getting documents: ", e);
-        return [];
+        console.warn("Firestore fetch failed, falling back to Local Storage:", e);
+        // Fallback to Local Storage
+        const localData = JSON.parse(localStorage.getItem(collectionName) || '[]');
+        return localData;
     }
 };
 ```
